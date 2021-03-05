@@ -5,6 +5,7 @@ import com.basketball.community.community.dto.GithubUser;
 import com.basketball.community.community.mapper.UserMapper;
 import com.basketball.community.community.model.User;
 import com.basketball.community.community.provider.GithubProvider;
+import com.basketball.community.community.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -31,6 +32,7 @@ public class AuthorizeController {
 
     @Autowired
     private UserMapper userMapper;
+    private UserService userService;
 
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
@@ -57,15 +59,22 @@ public class AuthorizeController {
 
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
-            user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtCreate());
+
             user.setAvatarUrl(githubUser.getAvatarUrl());
-            userMapper.insert(user);
-//            request.getSession().setAttribute("user", githubUser);
+           userService.createOrUpdate(user);
             response.addCookie(new Cookie("token", token));
             return "redirect:/";
         } else {
             return "redirect:/";
         }
+    }
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request,
+                         HttpServletResponse response){
+        request.getSession().removeAttribute("user");
+        Cookie cookie = new Cookie("token", null);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+        return "redirect:/";
     }
 }
