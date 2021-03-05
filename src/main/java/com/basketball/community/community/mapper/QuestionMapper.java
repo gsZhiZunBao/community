@@ -1,10 +1,7 @@
 package com.basketball.community.community.mapper;
 
 import com.basketball.community.community.model.Question;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -19,12 +16,15 @@ public interface QuestionMapper {
     @Select("select count(1) from question")
     Integer count();
 
-   @Select("select * from question where creator = #{userId} limit #{offset}, #{size}")
+    @Select("select * from question where creator = #{userId} limit #{offset}, #{size}")
     List<Question> listByUserId(@Param("userId") Integer userId, @Param(value = "offset") Integer offset, @Param(value = "size") Integer size);
 
-   @Select("select count(1) from question where creator = #{userId}")
+    @Select("select count(1) from question where creator = #{userId}")
     Integer countByUserId(@Param("userId") Integer userId);
 
-   @Select("select * from question where id = #{id}")
+    @Select("select * from question where id = #{id}")
     Question getById(@Param("id") Integer id);
+
+    @Update("update question set title = #{title}, description = #{description}, get_modified = #{getModified}, tag = #{tag} where id = #{id}")
+    void update(Question question);
 }
